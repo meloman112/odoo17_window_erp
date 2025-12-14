@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="seq_window_service_ticket" model="ir.sequence">
+            <field name="name">Window Service Ticket Sequence</field>
+            <field name="code">window.service.ticket</field>
+            <field name="prefix">SRV-</field>
+            <field name="padding">5</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+    </data>
+</odoo>
+

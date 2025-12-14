@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_window_dashboard" model="ir.actions.act_url">
+        <field name="name">Дашборд окон</field>
+        <field name="url">/window_dashboard</field>
+        <field name="target">self</field>
+    </record>
+
+    <template id="window_dashboard_template" inherit_id="web.layout">
+        <xpath expr="//t[@t-call='web.layout']" position="inside">
+            <t t-if="request.httprequest.path == '/window_dashboard'">
+                <div class="container-fluid">
+                    <h1>Дашборд оконного бизнеса</h1>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3>Воронка продаж</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div id="sales_funnel_chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3>Производственный план</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div id="production_plan_chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3>KPI замерщиков</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div id="measurer_kpi_chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3>KPI монтажников</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div id="installer_kpi_chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3>Срок обработки лида</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div id="lead_processing_time"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3>Доходность заказов</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div id="order_profitability"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+</odoo>
+

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Действие для записей на курсы -->
+    <record id="action_education_enrollment" model="ir.actions.act_window">
+        <field name="name">Записи на курсы</field>
+        <field name="res_model">education.enrollment</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Создайте первую запись на курс!
+            </p>
+            <p>
+                Записи связывают студентов с курсами и отслеживают прогресс обучения.
+            </p>
+        </field>
+    </record>
+
+    <!-- Представление списка записей -->
+    <record id="view_education_enrollment_tree" model="ir.ui.view">
+        <field name="name">education.enrollment.tree</field>
+        <field name="model">education.enrollment</field>
+        <field name="arch" type="xml">
+            <tree string="Записи на курсы" 
+                  decoration-info="state == 'enrolled'"
+                  decoration-success="state == 'completed'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="student_id"/>
+                <field name="course_id"/>
+                <field name="enrollment_date"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="progress" widget="progressbar"/>
+                <field name="final_grade"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'enrolled'"
+                       decoration-success="state == 'completed'"
+                       decoration-danger="state == 'cancelled'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Представление формы записи -->
+    <record id="view_education_enrollment_form" model="ir.ui.view">
+        <field name="name">education.enrollment.form</field>
+        <field name="model">education.enrollment</field>
+        <field name="arch" type="xml">
+            <form string="Запись на курс">
+                <header>
+                    <button name="action_confirm" type="object" 
+                            string="Подтвердить" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_start" type="object" 
+                            string="Начать обучение"
+                            invisible="state != 'enrolled'"/>
+                    <button name="action_complete" type="object" 
+                            string="Завершить обучение"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_cancel" type="object" 
+                            string="Отменить"
+                            invisible="state in ['cancelled', 'completed']"/>
+                    <button name="action_issue_certificate" type="object" 
+                            string="Выдать сертификат"
+                            invisible="state != 'completed' or certificate_issued"/>
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="draft,enrolled,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="student_id" options="{'no_create': True}"/>
+                            <field name="course_id" options="{'no_create': True}"/>
+                            <field name="enrollment_date"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="progress" widget="progressbar"/>
+                            <field name="final_grade"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="certificate_issued"/>
+                            <field name="certificate_date" 
+                                   invisible="not certificate_issued"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Заметки">
+                            <field name="notes" placeholder="Дополнительная информация о записи..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Представление kanban записей -->
+    <record id="view_education_enrollment_kanban" model="ir.ui.view">
+        <field name="name">education.enrollment.kanban</field>
+        <field name="model">education.enrollment</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="student_id"/>
+                <field name="course_id"/>
+                <field name="state"/>
+                <field name="progress"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <strong><field name="student_id"/></strong>
+                                    <br/>
+                                    <field name="course_id"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_card_content">
+                                <field name="progress" widget="progressbar"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Поиск записей -->
+    <record id="view_education_enrollment_search" model="ir.ui.view">
+        <field name="name">education.enrollment.search</field>
+        <field name="model">education.enrollment</field>
+        <field name="arch" type="xml">
+            <search string="Поиск записей">
+                <field name="student_id" string="Студент"/>
+                <field name="course_id" string="Курс"/>
+                <filter string="Активные" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Черновики" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Записаны" name="enrolled" domain="[('state', '=', 'enrolled')]"/>
+                <filter string="Идет обучение" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Завершены" name="completed" domain="[('state', '=', 'completed')]"/>
+                <separator/>
+                <filter string="С сертификатом" name="certificate" domain="[('certificate_issued', '=', True)]"/>
+                <group expand="0" string="Группировка">
+                    <filter string="По статусу" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="По курсу" name="group_course" context="{'group_by': 'course_id'}"/>
+                    <filter string="По студенту" name="group_student" context="{'group_by': 'student_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>
+

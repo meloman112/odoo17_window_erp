@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_window_service_ticket_tree" model="ir.ui.view">
+        <field name="name">window.service.ticket.tree</field>
+        <field name="model">window.service.ticket</field>
+        <field name="arch" type="xml">
+            <tree string="Сервисные обращения" decoration-info="state == 'new'" decoration-warning="state == 'in_progress'" decoration-success="state == 'resolved'">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="sale_order_id"/>
+                <field name="type_of_issue"/>
+                <field name="warranty_status"/>
+                <field name="state"/>
+                <field name="assigned_user_id"/>
+                <field name="create_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_window_service_ticket_form" model="ir.ui.view">
+        <field name="name">window.service.ticket.form</field>
+        <field name="model">window.service.ticket</field>
+        <field name="arch" type="xml">
+            <form string="Сервисное обращение">
+                <header>
+                    <button name="action_assign" string="Назначить" type="object" class="oe_highlight" invisible="state != 'new'"/>
+                    <button name="action_start" string="Начать работу" type="object" class="oe_highlight" invisible="state != 'assigned'"/>
+                    <button name="action_resolve" string="Решить" type="object" class="oe_highlight" invisible="state != 'in_progress'"/>
+                    <button name="action_close" string="Закрыть" type="object" invisible="state != 'resolved'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="new,assigned,in_progress,resolved,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <field name="sale_order_id" invisible="1"/>
+                        <field name="installation_task_id" invisible="1"/>
+                        <button name="action_view_sale_order" type="object" class="oe_stat_button" icon="fa-shopping-cart" invisible="not sale_order_id">
+                            <field name="sale_order_id" widget="statinfo" string="Заказ"/>
+                        </button>
+                        <button name="action_view_installation_task" type="object" class="oe_stat_button" icon="fa-tasks" invisible="not installation_task_id">
+                            <field name="installation_task_id" widget="statinfo" string="Монтаж"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="partner_id" options="{'no_create': True}"/>
+                            <field name="sale_order_id" options="{'no_create': True}"/>
+                            <field name="installation_task_id" options="{'no_create': True}"/>
+                            <field name="window_measure_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="type_of_issue"/>
+                            <field name="warranty_status"/>
+                            <field name="installation_date"/>
+                            <field name="assigned_user_id"/>
+                            <field name="date_resolved" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Описание проблемы">
+                            <field name="description" placeholder="Подробное описание проблемы..."/>
+                        </page>
+                        <page string="Решение" invisible="state not in ['resolved', 'closed']">
+                            <field name="resolution" placeholder="Опишите решение проблемы..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_window_service_ticket_search" model="ir.ui.view">
+        <field name="name">window.service.ticket.search</field>
+        <field name="model">window.service.ticket</field>
+        <field name="arch" type="xml">
+            <search string="Поиск обращений">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="sale_order_id"/>
+                <filter string="Новое" name="new" domain="[('state', '=', 'new')]"/>
+                <filter string="Назначено" name="assigned" domain="[('state', '=', 'assigned')]"/>
+                <filter string="В работе" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Решено" name="resolved" domain="[('state', '=', 'resolved')]"/>
+                <filter string="На гарантии" name="in_warranty" domain="[('warranty_status', '=', 'in_warranty')]"/>
+                <filter string="Вне гарантии" name="out_of_warranty" domain="[('warranty_status', '=', 'out_of_warranty')]"/>
+                <filter string="Мои обращения" name="my_tickets" domain="[('assigned_user_id', '=', uid)]"/>
+                <group expand="0" string="Группировать">
+                    <filter string="По статусу" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="По типу проблемы" name="group_type" context="{'group_by': 'type_of_issue'}"/>
+                    <filter string="По статусу гарантии" name="group_warranty" context="{'group_by': 'warranty_status'}"/>
+                    <filter string="По назначенному" name="group_assigned" context="{'group_by': 'assigned_user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_window_service_ticket" model="ir.actions.act_window">
+        <field name="name">Сервисные обращения</field>
+        <field name="res_model">window.service.ticket</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_assigned_user_id': uid}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Создайте первое сервисное обращение!
+            </p>
+            <p>
+                Сервисные обращения создаются для гарантийных и постгарантийных случаев.
+            </p>
+        </field>
+    </record>
+</odoo>
+

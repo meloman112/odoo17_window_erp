@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_contract" model="ir.actions.report">
+        <field name="name">Договор</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">window_offer.report_contract_document</field>
+        <field name="report_file">window_offer.report_contract_document</field>
+        <field name="print_report_name">'Договор-' + (object.name or '').replace('/', '-')</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_contract_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <h2>ДОГОВОР НА ИЗГОТОВЛЕНИЕ И МОНТАЖ ОКОН</h2>
+                                <p>№ <t t-esc="o.name"/> от <t t-esc="format_date(o.date_order) if o.date_order else ''"/></p>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <p>
+                                    <strong>Исполнитель:</strong> <t t-esc="o.company_id.name or ''"/><br/>
+                                    <strong>Заказчик:</strong> <t t-esc="o.partner_id.name or ''"/>
+                                </p>
+                                <p>
+                                    <strong>Предмет договора:</strong> Изготовление и монтаж оконных конструкций согласно спецификации.
+                                </p>
+                                <p>
+                                    <strong>Стоимость работ:</strong> <t t-esc="format_amount(o.amount_total, o.currency_id)"/>
+                                </p>
+                                <p>
+                                    <strong>Срок выполнения:</strong> 14-21 рабочий день с момента получения аванса.
+                                </p>
+                                <p>
+                                    <strong>Гарантия:</strong> 5 лет на профиль и фурнитуру, 2 года на монтажные работы.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <p><strong>Исполнитель:</strong></p>
+                                <p>_________________</p>
+                            </div>
+                            <div class="col-6">
+                                <p><strong>Заказчик:</strong></p>
+                                <p>_________________</p>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
+

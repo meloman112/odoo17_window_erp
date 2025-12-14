@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Главное меню -->
+    <menuitem id="menu_education_center_root" 
+              name="Учебный центр" 
+              sequence="100"
+              web_icon="education_center,static/description/icon.png"/>
+
+    <!-- Подменю: Управление -->
+    <menuitem id="menu_education_center_management" 
+              name="Управление" 
+              parent="menu_education_center_root" 
+              sequence="10"/>
+
+    <!-- Меню: Курсы -->
+    <menuitem id="menu_education_course" 
+              name="Курсы" 
+              parent="menu_education_center_management" 
+              action="action_education_course" 
+              sequence="10"/>
+
+    <!-- Меню: Студенты -->
+    <menuitem id="menu_education_student" 
+              name="Студенты" 
+              parent="menu_education_center_management" 
+              action="action_education_student" 
+              sequence="20"/>
+
+    <!-- Меню: Записи на курсы -->
+    <menuitem id="menu_education_enrollment" 
+              name="Записи на курсы" 
+              parent="menu_education_center_management" 
+              action="action_education_enrollment" 
+              sequence="30"/>
+
+    <!-- Подменю: Отчеты -->
+    <menuitem id="menu_education_center_reports" 
+              name="Отчеты" 
+              parent="menu_education_center_root" 
+              sequence="20"/>
+</odoo>
+

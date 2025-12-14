@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Стейджи CRM для оконного бизнеса -->
+        <record id="crm_stage_new" model="crm.stage">
+            <field name="name">Новый</field>
+            <field name="sequence">1</field>
+            <field name="is_won">False</field>
+            <field name="fold">False</field>
+        </record>
+
+        <record id="crm_stage_consultation" model="crm.stage">
+            <field name="name">Консультация</field>
+            <field name="sequence">2</field>
+            <field name="is_won">False</field>
+            <field name="fold">False</field>
+        </record>
+
+        <record id="crm_stage_calculation" model="crm.stage">
+            <field name="name">Калькуляция</field>
+            <field name="sequence">3</field>
+            <field name="is_won">False</field>
+            <field name="fold">False</field>
+        </record>
+
+        <record id="crm_stage_measure_assigned" model="crm.stage">
+            <field name="name">Назначен замер</field>
+            <field name="sequence">4</field>
+            <field name="is_won">False</field>
+            <field name="fold">False</field>
+        </record>
+
+        <record id="crm_stage_measure_done" model="crm.stage">
+            <field name="name">Замер выполнен</field>
+            <field name="sequence">5</field>
+            <field name="is_won">False</field>
+            <field name="fold">False</field>
+        </record>
+
+        <record id="crm_stage_offer_contract" model="crm.stage">
+            <field name="name">КП/Договор</field>
+            <field name="sequence">6</field>
+            <field name="is_won">False</field>
+            <field name="fold">False</field>
+        </record>
+
+        <record id="crm_stage_advance_received" model="crm.stage">
+            <field name="name">Аванс получен</field>
+            <field name="sequence">7</field>
+            <field name="is_won">False</field>
+            <field name="fold">False</field>
+        </record>
+
+        <record id="crm_stage_production" model="crm.stage">
+            <field name="name">Производство</field>
+            <field name="sequence">8</field>
+            <field name="is_won">False</field>
+            <field name="fold">False</field>
+        </record>
+
+        <record id="crm_stage_ready_delivery" model="crm.stage">
+            <field name="name">Готово к доставке</field>
+            <field name="sequence">9</field>
+            <field name="is_won">False</field>
+            <field name="fold">False</field>
+        </record>
+
+        <record id="crm_stage_installation" model="crm.stage">
+            <field name="name">Монтаж</field>
+            <field name="sequence">10</field>
+            <field name="is_won">False</field>
+            <field name="fold">False</field>
+        </record>
+
+        <record id="crm_stage_completed" model="crm.stage">
+            <field name="name">Завершено</field>
+            <field name="sequence">11</field>
+            <field name="is_won">True</field>
+            <field name="fold">True</field>
+        </record>
+
+        <record id="crm_stage_post_service" model="crm.stage">
+            <field name="name">Пост-сервис</field>
+            <field name="sequence">12</field>
+            <field name="is_won">False</field>
+            <field name="fold">True</field>
+        </record>
+    </data>
+</odoo>
+

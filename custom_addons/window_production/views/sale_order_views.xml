@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_window_production" model="ir.ui.view">
+        <field name="name">sale.order.form.window.production</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="window_offer.view_order_form_window_offer"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[.//field[@name='production_id']]" position="inside">
+                <button name="action_view_production" type="object" string="Открыть производство" class="oe_highlight" invisible="not production_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

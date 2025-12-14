@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_window_service_root"
+              name="Сервис"
+              sequence="20"
+              groups="base.group_user"/>
+
+    <menuitem id="menu_window_service_tickets"
+              name="Сервисные обращения"
+              parent="menu_window_service_root"
+              action="action_window_service_ticket"
+              sequence="10"/>
+</odoo>
+

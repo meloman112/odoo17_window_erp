@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Проект для монтажа -->
+        <record id="project_window_installation" model="project.project">
+            <field name="name">Монтаж</field>
+            <field name="description">Проект для управления монтажом окон</field>
+            <field name="is_installation_project">True</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+    </data>
+</odoo>
+

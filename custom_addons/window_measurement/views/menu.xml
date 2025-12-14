@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_window_measurement_root"
+              name="Замеры"
+              sequence="10"
+              groups="base.group_user"/>
+
+    <menuitem id="menu_window_measurement_measures"
+              name="Замеры окон"
+              parent="menu_window_measurement_root"
+              action="action_window_measure"
+              sequence="10"/>
+</odoo>
+

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Проект для замеров -->
+        <record id="project_window_measurement" model="project.project">
+            <field name="name">Замеры</field>
+            <field name="description">Проект для управления замерами окон</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+    </data>
+</odoo>
+

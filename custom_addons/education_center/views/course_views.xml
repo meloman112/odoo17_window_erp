@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Действие для курсов -->
+    <record id="action_education_course" model="ir.actions.act_window">
+        <field name="name">Курсы</field>
+        <field name="res_model">education.course</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Создайте первый курс!
+            </p>
+            <p>
+                Курсы - это основные образовательные программы вашего учебного центра.
+            </p>
+        </field>
+    </record>
+
+    <!-- Представление списка курсов -->
+    <record id="view_education_course_tree" model="ir.ui.view">
+        <field name="name">education.course.tree</field>
+        <field name="model">education.course</field>
+        <field name="arch" type="xml">
+            <tree string="Курсы" decoration-info="state == 'open'" 
+                  decoration-success="state == 'completed'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="instructor_id"/>
+                <field name="duration_hours"/>
+                <field name="price"/>
+                <field name="enrollment_count"/>
+                <field name="active_student_count"/>
+                <field name="state" widget="badge" 
+                       decoration-info="state == 'open'"
+                       decoration-success="state == 'completed'"
+                       decoration-danger="state == 'cancelled'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Представление формы курса -->
+    <record id="view_education_course_form" model="ir.ui.view">
+        <field name="name">education.course.form</field>
+        <field name="model">education.course</field>
+        <field name="arch" type="xml">
+            <form string="Курс">
+                <header>
+                    <button name="action_open_enrollments" type="object" 
+                            string="Записи" class="oe_highlight" 
+                            icon="fa-users"/>
+                    <button name="action_open_students" type="object" 
+                            string="Студенты" icon="fa-graduation-cap"/>
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="draft,open,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_enrollments" type="object" 
+                                class="oe_stat_button" icon="fa-users">
+                            <field name="enrollment_count" widget="statinfo" 
+                                   string="Записей"/>
+                        </button>
+                        <button name="action_open_students" type="object" 
+                                class="oe_stat_button" icon="fa-graduation-cap">
+                            <field name="active_student_count" widget="statinfo" 
+                                   string="Студентов"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="instructor_id"/>
+                            <field name="duration_hours"/>
+                        </group>
+                        <group>
+                            <field name="price"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="state"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Описание">
+                            <field name="description" placeholder="Описание курса..."/>
+                        </page>
+                        <page string="Записи на курс">
+                            <field name="enrollment_ids" nolabel="1">
+                                <tree>
+                                    <field name="student_id"/>
+                                    <field name="enrollment_date"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="progress"/>
+                                    <field name="final_grade"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Представление kanban курсов -->
+    <record id="view_education_course_kanban" model="ir.ui.view">
+        <field name="name">education.course.kanban</field>
+        <field name="model">education.course</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="state"/>
+                <field name="enrollment_count"/>
+                <field name="instructor_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <strong><field name="name"/></strong>
+                                    <br/>
+                                    <field name="code"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_card_content">
+                                <field name="instructor_id"/>
+                                <div class="mt-2">
+                                    <span>Записей: <field name="enrollment_count"/></span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Поиск курсов -->
+    <record id="view_education_course_search" model="ir.ui.view">
+        <field name="name">education.course.search</field>
+        <field name="model">education.course</field>
+        <field name="arch" type="xml">
+            <search string="Поиск курсов">
+                <field name="name" string="Название"/>
+                <field name="code" string="Код"/>
+                <field name="instructor_id" string="Преподаватель"/>
+                <filter string="Активные" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Открыты для записи" name="open" domain="[('state', '=', 'open')]"/>
+                <filter string="Идет обучение" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <separator/>
+                <filter string="Архивные" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Группировка">
+                    <filter string="По статусу" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="По преподавателю" name="group_instructor" context="{'group_by': 'instructor_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>
+

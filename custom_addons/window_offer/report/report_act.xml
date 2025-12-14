@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_act" model="ir.actions.report">
+        <field name="name">Акт выполненных работ</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">window_offer.report_act_document</field>
+        <field name="report_file">window_offer.report_act_document</field>
+        <field name="print_report_name">'Акт-' + (object.name or '').replace('/', '-')</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_act_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <h2>АКТ ВЫПОЛНЕННЫХ РАБОТ</h2>
+                                <p>№ <t t-esc="o.name"/> от <t t-esc="format_date(context_timestamp(datetime.now()))"/></p>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <p>
+                                    <strong>Исполнитель:</strong> <t t-esc="o.company_id.name or ''"/><br/>
+                                    <strong>Заказчик:</strong> <t t-esc="o.partner_id.name or ''"/>
+                                </p>
+                                <p>
+                                    Настоящий акт подтверждает выполнение работ по договору № <t t-esc="o.name"/> от <t t-esc="o.date_order.strftime('%d.%m.%Y') if o.date_order else ''"/>.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>№</th>
+                                            <th>Наименование работ</th>
+                                            <th class="text-right">Кол-во</th>
+                                            <th class="text-right">Сумма</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="o.order_line" t-as="line">
+                                            <tr>
+                                                <td><t t-esc="line_index + 1"/></td>
+                                                <td><t t-esc="line.product_id.name or line.name"/></td>
+                                                <td class="text-right"><t t-esc="line.product_uom_qty"/></td>
+                                                <td class="text-right"><t t-esc="format_amount(line.price_subtotal, o.currency_id)"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="3" class="text-right"><strong>Итого:</strong></td>
+                                            <td class="text-right"><strong><t t-esc="format_amount(o.amount_total, o.currency_id)"/></strong></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <p>Работы выполнены в полном объеме, качественно и в срок. Претензий нет.</p>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <p><strong>Исполнитель:</strong></p>
+                                <p>_________________</p>
+                            </div>
+                            <div class="col-6">
+                                <p><strong>Заказчик:</strong></p>
+                                <p>_________________</p>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
+

@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_project_task_installer,project.task.installer,model_project_task,window_installation.group_window_installer,1,1,1,0
+access_project_task_manager,project.task.manager,model_project_task,base.group_system,1,1,1,1
+

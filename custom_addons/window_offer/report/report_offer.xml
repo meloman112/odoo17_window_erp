@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_offer" model="ir.actions.report">
+        <field name="name">Коммерческое предложение</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">window_offer.report_offer_document</field>
+        <field name="report_file">window_offer.report_offer_document</field>
+        <field name="print_report_name">'КП-' + (object.name or '').replace('/', '-')</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_offer_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div class="row">
+                            <div class="col-12">
+                                <h2 class="text-center">КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ</h2>
+                                <p class="text-right">
+                                    <strong>№ <t t-esc="o.name"/></strong><br/>
+                                    <span>от <t t-esc="format_date(o.date_order) if o.date_order else ''"/></span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <h4>Клиент:</h4>
+                                <p>
+                                    <t t-esc="o.partner_id.name or ''"/><br/>
+                                    <t t-if="o.partner_id.street">
+                                        <t t-esc="o.partner_id.street"/><br/>
+                                    </t>
+                                    <t t-if="o.partner_id.city or o.partner_id.zip">
+                                        <t t-if="o.partner_id.city"><t t-esc="o.partner_id.city"/></t><t t-if="o.partner_id.zip">, <t t-esc="o.partner_id.zip"/></t>
+                                    </t>
+                                </p>
+                            </div>
+                            <div class="col-6">
+                                <h4>Параметры окон:</h4>
+                                <p>
+                                    <t t-if="o.window_profile_type">
+                                        Профиль: <t t-esc="dict(o._fields['window_profile_type'].selection).get(o.window_profile_type) or o.window_profile_type"/><br/>
+                                    </t>
+                                    <t t-if="o.window_glass_unit_type">
+                                        Стеклопакет: <t t-esc="dict(o._fields['window_glass_unit_type'].selection).get(o.window_glass_unit_type) or o.window_glass_unit_type"/><br/>
+                                    </t>
+                                    <t t-if="o.window_width and o.window_height">
+                                        Размеры: <t t-esc="int(o.window_width)"/> x <t t-esc="int(o.window_height)"/> мм<br/>
+                                    </t>
+                                    <t t-if="o.window_color">
+                                        Цвет: <t t-esc="o.window_color"/>
+                                    </t>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Наименование</th>
+                                            <th class="text-right">Кол-во</th>
+                                            <th class="text-right">Цена</th>
+                                            <th class="text-right">Сумма</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="o.order_line" t-as="line">
+                                            <tr>
+                                                <td><t t-esc="line.product_id.name or line.name"/></td>
+                                                <td class="text-right"><t t-esc="line.product_uom_qty"/></td>
+                                                <td class="text-right"><t t-esc="format_amount(line.price_unit, o.currency_id)"/></td>
+                                                <td class="text-right"><t t-esc="format_amount(line.price_subtotal, o.currency_id)"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="3" class="text-right"><strong>Итого:</strong></td>
+                                            <td class="text-right"><strong><t t-esc="format_amount(o.amount_total, o.currency_id)"/></strong></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <p><strong>Условия:</strong></p>
+                                <p>Срок изготовления: 14-21 рабочий день</p>
+                                <p>Гарантия: 5 лет</p>
+                                <p>Срок действия предложения: 30 дней</p>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
+

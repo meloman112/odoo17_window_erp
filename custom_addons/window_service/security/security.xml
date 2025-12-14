@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Группы -->
+        <record id="group_window_service" model="res.groups">
+            <field name="name">Сервисный инженер</field>
+            <field name="category_id" ref="base.module_category_services"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">Доступ к сервисным обращениям по окнам</field>
+        </record>
+    </data>
+</odoo>
+

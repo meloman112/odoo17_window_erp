@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_mrp_production_form_window" model="ir.ui.view">
+        <field name="name">mrp.production.form.window</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="window_order_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="window_measure_id" options="{'no_create': True}" invisible="not window_order_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

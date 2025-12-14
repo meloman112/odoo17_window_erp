@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Группы -->
+        <record id="group_call_center" model="res.groups">
+            <field name="name">Call Center</field>
+            <field name="category_id" ref="base.module_category_sales"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">Ограниченный доступ к лидам - только ранние стадии. Может создавать и редактировать лиды только на ранних стадиях (до "Назначен замер"). Не может удалять лиды.</field>
+        </record>
+
+        <!-- Record Rules -->
+        <!-- Call Center видит только лиды на ранних стадиях -->
+        <record id="crm_lead_call_center_rule" model="ir.rule">
+            <field name="name">Call Center: только ранние стадии</field>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="domain_force">[
+                ('stage_id.sequence', '&lt;=', 4)
+            ]</field>
+            <field name="groups" eval="[(4, ref('window_crm.group_call_center'))]"/>
+        </record>
+
+        <!-- Call Center не может удалять -->
+        <record id="crm_lead_call_center_no_delete" model="ir.rule">
+            <field name="name">Call Center: запрет удаления</field>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="groups" eval="[(4, ref('window_crm.group_call_center'))]"/>
+        </record>
+    </data>
+</odoo>
+

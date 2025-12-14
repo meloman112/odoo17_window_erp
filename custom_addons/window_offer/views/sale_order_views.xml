@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_window_offer" model="ir.ui.view">
+        <field name="name">sale.order.form.window.offer</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='client_order_ref']" position="after">
+                <field name="window_measure_id" options="{'no_create': True}"/>
+                <field name="is_window_order" invisible="1"/>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_print_offer" string="Печать КП" type="object" class="oe_highlight" invisible="not is_window_order"/>
+                <button name="action_print_contract" string="Печать договора" type="object" invisible="not is_window_order or state not in ['sale', 'done']"/>
+                <button name="action_print_specification" string="Спецификация" type="object" invisible="not is_window_order"/>
+                <button name="action_print_act" string="Акт" type="object" invisible="not is_window_order or state != 'done'"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Технические параметры окон" invisible="not is_window_order">
+                    <group>
+                        <group>
+                            <field name="window_profile_type"/>
+                            <field name="window_glass_unit_type"/>
+                            <field name="window_color"/>
+                        </group>
+                        <group>
+                            <field name="window_width"/>
+                            <field name="window_height"/>
+                            <field name="installation_complexity"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="Производство (MRP)" invisible="not is_window_order">
+                    <group>
+                        <field name="production_id" options="{'no_create': True}"/>
+                        <field name="production_state"/>
+                    </group>
+                </page>
+                <page name="installation_tab" string="Монтаж" invisible="not is_window_order">
+                    <group>
+                        <group>
+                            <field name="installation_task_id" options="{'no_create': True}"/>
+                            <field name="installation_planned_date"/>
+                            <field name="installation_delivery_date"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="Документы" invisible="not is_window_order">
+                    <group>
+                        <field name="offer_pdf" filename="offer_pdf_name" widget="binary"/>
+                        <field name="contract_pdf" filename="contract_pdf_name" widget="binary"/>
+                        <field name="act_pdf" filename="act_pdf_name" widget="binary"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_order_tree_window_offer" model="ir.ui.view">
+        <field name="name">sale.order.tree.window.offer</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="is_window_order" column_invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

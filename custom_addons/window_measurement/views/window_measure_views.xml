@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_window_measure_tree" model="ir.ui.view">
+        <field name="name">window.measure.tree</field>
+        <field name="model">window.measure</field>
+        <field name="arch" type="xml">
+            <tree string="Замеры" decoration-info="state == 'planned'" decoration-warning="state == 'in_progress'" decoration-success="state == 'done'">
+                <field name="name"/>
+                <field name="deal_id"/>
+                <field name="customer_id"/>
+                <field name="address"/>
+                <field name="date_planned"/>
+                <field name="measurer_id"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_window_measure_form" model="ir.ui.view">
+        <field name="name">window.measure.form</field>
+        <field name="model">window.measure</field>
+        <field name="arch" type="xml">
+            <form string="Замер окон">
+                <header>
+                    <button name="action_confirm" string="Подтвердить" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_start" string="Начать" type="object" class="oe_highlight" invisible="state != 'planned'"/>
+                    <button name="action_done" string="Завершить" type="object" class="oe_highlight" invisible="state != 'in_progress'"/>
+                    <button name="action_create_offer" string="Создать КП" type="object" class="oe_highlight" invisible="state != 'done'"/>
+                    <button name="action_cancel" string="Отменить" type="object" invisible="state in ['done', 'cancelled']"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,planned,in_progress,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <field name="task_id" invisible="1"/>
+                        <field name="offer_id" invisible="1"/>
+                        <button name="action_view_task" type="object" class="oe_stat_button" icon="fa-tasks" invisible="not task_id">
+                            <field name="task_id" widget="statinfo" string="Задача"/>
+                        </button>
+                        <button name="action_create_offer" type="object" class="oe_stat_button" icon="fa-file-text-o" invisible="offer_id">
+                            <field name="offer_id" widget="statinfo" string="КП"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="deal_id" options="{'no_create': True}"/>
+                            <field name="customer_id" readonly="1"/>
+                            <field name="address" placeholder="Полный адрес замера..."/>
+                        </group>
+                        <group>
+                            <field name="date_planned"/>
+                            <field name="date_done" readonly="state != 'done'"/>
+                            <field name="measurer_id"/>
+                            <field name="state"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Технические параметры">
+                            <group>
+                                <group>
+                                    <field name="room_type"/>
+                                    <field name="profile_type"/>
+                                    <field name="glass_unit_type"/>
+                                    <field name="color"/>
+                                </group>
+                                <group>
+                                    <field name="width"/>
+                                    <field name="height"/>
+                                    <field name="installation_complexity"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Фотографии">
+                            <field name="photos" widget="many2many_binary"/>
+                        </page>
+                        <page string="Комментарии">
+                            <field name="comments" placeholder="Дополнительная информация о замере..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_window_measure_search" model="ir.ui.view">
+        <field name="name">window.measure.search</field>
+        <field name="model">window.measure</field>
+        <field name="arch" type="xml">
+            <search string="Поиск замеров">
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="address"/>
+                <field name="deal_id"/>
+                <filter string="Черновик" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Запланирован" name="planned" domain="[('state', '=', 'planned')]"/>
+                <filter string="В работе" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Выполнен" name="done" domain="[('state', '=', 'done')]"/>
+                <filter string="Мои замеры" name="my_measures" domain="[('measurer_id', '=', uid)]"/>
+                <group expand="0" string="Группировать">
+                    <filter string="По статусу" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="По замерщику" name="group_measurer" context="{'group_by': 'measurer_id'}"/>
+                    <filter string="По дате" name="group_date" context="{'group_by': 'date_planned'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_window_measure" model="ir.actions.act_window">
+        <field name="name">Замеры окон</field>
+        <field name="res_model">window.measure</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_measurer_id': uid}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Создайте первый замер!
+            </p>
+            <p>
+                Замеры создаются из CRM лидов или вручную.
+            </p>
+        </field>
+    </record>
+</odoo>
+

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_crm_lead_form_window_measurement" model="ir.ui.view">
+        <field name="name">crm.lead.form.window.measurement</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='expected_revenue']" position="after">
+                <field name="object_type"/>
+                <field name="area_type"/>
+                <field name="budget"/>
+                <field name="lead_temperature"/>
+                <field name="desired_date_measure"/>
+            </xpath>
+            <xpath expr="//field[@name='activity_ids']" position="after">
+                <field name="measurement_id" readonly="1"/>
+                <field name="contract_id" readonly="1"/>
+                <field name="production_id" readonly="1"/>
+                <field name="installation_id" readonly="1"/>
+                <field name="delivery_date"/>
+                <field name="final_payment_status"/>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <field name="measurement_id" invisible="1"/>
+                <button name="action_create_measurement" string="Создать замер" type="object" class="oe_highlight" invisible="measurement_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_window_service_ticket_user,window.service.ticket.user,model_window_service_ticket,base.group_user,1,1,1,0
+access_window_service_ticket_manager,window.service.ticket.manager,model_window_service_ticket,base.group_system,1,1,1,1

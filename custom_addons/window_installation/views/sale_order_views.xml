@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_window_installation" model="ir.ui.view">
+        <field name="name">sale.order.form.window.installation</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="window_offer.view_order_form_window_offer"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='installation_tab']" position="inside">
+                <field name="installation_task_id" invisible="1"/>
+                <button name="action_create_installation_task" string="Создать задачу монтажа" type="object" class="oe_highlight" invisible="not is_window_order or installation_task_id"/>
+                <button name="action_view_installation_task" type="object" class="oe_stat_button" icon="fa-tasks" invisible="not installation_task_id">
+                    <field name="installation_task_id" widget="statinfo" string="Задача монтажа"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

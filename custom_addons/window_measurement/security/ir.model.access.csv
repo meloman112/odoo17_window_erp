@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_window_measure_user,window.measure.user,model_window_measure,base.group_user,1,1,1,0
+access_window_measure_measurer,window.measure.measurer,model_window_measure,window_measurement.group_window_measurer,1,1,1,0
+access_window_measure_manager,window.measure.manager,model_window_measure,base.group_system,1,1,1,1
+

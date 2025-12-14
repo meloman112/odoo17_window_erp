@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Действие для студентов -->
+    <record id="action_education_student" model="ir.actions.act_window">
+        <field name="name">Студенты</field>
+        <field name="res_model">education.student</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Создайте первого студента!
+            </p>
+            <p>
+                Студенты - это учащиеся вашего учебного центра.
+            </p>
+        </field>
+    </record>
+
+    <!-- Представление списка студентов -->
+    <record id="view_education_student_tree" model="ir.ui.view">
+        <field name="name">education.student.tree</field>
+        <field name="model">education.student</field>
+        <field name="arch" type="xml">
+            <tree string="Студенты">
+                <field name="name"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="enrollment_count"/>
+                <field name="completed_courses_count"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Представление формы студента -->
+    <record id="view_education_student_form" model="ir.ui.view">
+        <field name="name">education.student.form</field>
+        <field name="model">education.student</field>
+        <field name="arch" type="xml">
+            <form string="Студент">
+                <header>
+                    <button name="action_open_enrollments" type="object" 
+                            string="Записи" class="oe_highlight" 
+                            icon="fa-list"/>
+                    <button name="action_open_courses" type="object" 
+                            string="Курсы" icon="fa-book"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_enrollments" type="object" 
+                                class="oe_stat_button" icon="fa-list">
+                            <field name="enrollment_count" widget="statinfo" 
+                                   string="Записей"/>
+                        </button>
+                        <button name="action_open_courses" type="object" 
+                                class="oe_stat_button" icon="fa-book">
+                            <field name="completed_courses_count" widget="statinfo" 
+                                   string="Завершено"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="email"/>
+                            <field name="phone"/>
+                            <field name="birth_date"/>
+                        </group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Записи на курсы">
+                            <field name="enrollment_ids" nolabel="1">
+                                <tree>
+                                    <field name="course_id"/>
+                                    <field name="enrollment_date"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="progress"/>
+                                    <field name="final_grade"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Заметки">
+                            <field name="notes" placeholder="Дополнительная информация о студенте..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Представление kanban студентов -->
+    <record id="view_education_student_kanban" model="ir.ui.view">
+        <field name="name">education.student.kanban</field>
+        <field name="model">education.student</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="email"/>
+                <field name="enrollment_count"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <strong><field name="name"/></strong>
+                                </div>
+                            </div>
+                            <div class="o_kanban_card_content">
+                                <field name="email"/>
+                                <div class="mt-2">
+                                    <span>Записей: <field name="enrollment_count"/></span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Поиск студентов -->
+    <record id="view_education_student_search" model="ir.ui.view">
+        <field name="name">education.student.search</field>
+        <field name="model">education.student</field>
+        <field name="arch" type="xml">
+            <search string="Поиск студентов">
+                <field name="name" string="ФИО"/>
+                <field name="email" string="Email"/>
+                <field name="phone" string="Телефон"/>
+                <filter string="Активные" name="active" domain="[('active', '=', True)]"/>
+                <separator/>
+                <filter string="Архивные" name="inactive" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+</odoo>
+

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_project_task_form_installation" model="ir.ui.view">
+        <field name="name">project.task.form.installation</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_ids']" position="after">
+                <field name="is_installation_task" invisible="1"/>
+                <field name="installer_team_id" invisible="not is_installation_task"/>
+                <field name="installation_state" widget="statusbar" statusbar_visible="assigned,delivery,installation,cleaning,act" invisible="not is_installation_task"/>
+            </xpath>
+            <xpath expr="//field[@name='date_deadline']" position="after">
+                <field name="planned_date" invisible="not is_installation_task"/>
+                <field name="delivery_date" invisible="not is_installation_task"/>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_start_delivery" string="Начать доставку" type="object" class="oe_highlight" invisible="not is_installation_task or installation_state != 'assigned'"/>
+                <button name="action_start_installation" string="Начать монтаж" type="object" class="oe_highlight" invisible="not is_installation_task or installation_state != 'delivery'"/>
+                <button name="action_start_cleaning" string="Начать уборку" type="object" class="oe_highlight" invisible="not is_installation_task or installation_state != 'installation'"/>
+                <button name="action_create_act" string="Создать акт" type="object" class="oe_highlight" invisible="not is_installation_task or installation_state != 'cleaning'"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Монтаж" invisible="not is_installation_task">
+                    <group>
+                        <group>
+                            <field name="sale_order_id" options="{'no_create': True}"/>
+                            <field name="window_measure_id" options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="planned_date"/>
+                            <field name="delivery_date"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="installation_photos" widget="many2many_binary"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_project_task_tree_installation" model="ir.ui.view">
+        <field name="name">project.task.tree.installation</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_tree2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_ids']" position="after">
+                <field name="is_installation_task" invisible="1"/>
+                <field name="installation_state" invisible="not is_installation_task"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

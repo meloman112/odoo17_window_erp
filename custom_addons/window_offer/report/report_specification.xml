@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_specification" model="ir.actions.report">
+        <field name="name">Спецификация</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">window_offer.report_specification_document</field>
+        <field name="report_file">window_offer.report_specification_document</field>
+        <field name="print_report_name">'Спецификация-' + (object.name or '').replace('/', '-')</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_specification_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <h2>СПЕЦИФИКАЦИЯ</h2>
+                                <p>к договору № <t t-esc="o.name"/> от <t t-esc="format_date(o.date_order) if o.date_order else ''"/></p>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>№</th>
+                                            <th>Наименование</th>
+                                            <th>Параметры</th>
+                                            <th class="text-right">Кол-во</th>
+                                            <th class="text-right">Цена</th>
+                                            <th class="text-right">Сумма</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="o.order_line" t-as="line">
+                                            <tr>
+                                                <td><t t-esc="line_index + 1"/></td>
+                                                <td><t t-esc="line.product_id.name or line.name"/></td>
+                                                <td>
+                                                    <t t-if="line.window_width and line.window_height">
+                                                        <t t-esc="int(line.window_width)"/> x <t t-esc="int(line.window_height)"/> мм
+                                                    </t>
+                                                </td>
+                                                <td class="text-right"><t t-esc="line.product_uom_qty"/></td>
+                                                <td class="text-right"><t t-esc="format_amount(line.price_unit, o.currency_id)"/></td>
+                                                <td class="text-right"><t t-esc="format_amount(line.price_subtotal, o.currency_id)"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="5" class="text-right"><strong>Итого:</strong></td>
+                                            <td class="text-right"><strong><t t-esc="format_amount(o.amount_total, o.currency_id)"/></strong></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
+
