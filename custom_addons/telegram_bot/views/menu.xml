@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_telegram_root" name="Telegram" sequence="100" web_icon="telegram_bot,static/description/icon.png"/>
+
+    <menuitem id="menu_telegram_config" name="Настройки" parent="menu_telegram_root" sequence="10"/>
+    <menuitem id="menu_telegram_bot_config" name="Конфигурация бота" parent="menu_telegram_config"
+              action="action_telegram_bot_config" sequence="10"/>
+
+    <menuitem id="menu_telegram_users" name="Пользователи" parent="menu_telegram_root" sequence="20"/>
+    <menuitem id="menu_telegram_user_list" name="Telegram пользователи" parent="menu_telegram_users"
+              action="action_telegram_user" sequence="10"/>
+
+    <menuitem id="menu_telegram_messages" name="Сообщения" parent="menu_telegram_root" sequence="30"/>
+    <menuitem id="menu_telegram_message_list" name="История сообщений" parent="menu_telegram_messages"
+              action="action_telegram_message" sequence="10"/>
+</odoo>
+

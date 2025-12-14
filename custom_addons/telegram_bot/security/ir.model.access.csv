@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_telegram_bot_config_user,telegram.bot.config.user,model_telegram_bot_config,base.group_user,1,0,0,0
+access_telegram_bot_config_manager,telegram.bot.config.manager,model_telegram_bot_config,base.group_system,1,1,1,1
+access_telegram_user_user,telegram.user.user,model_telegram_user,base.group_user,1,1,1,0
+access_telegram_user_manager,telegram.user.manager,model_telegram_user,base.group_system,1,1,1,1
+access_telegram_message_user,telegram.message.user,model_telegram_message,base.group_user,1,1,1,0
+access_telegram_message_manager,telegram.message.manager,model_telegram_message,base.group_system,1,1,1,1
+access_telegram_message_wizard_user,telegram.message.wizard.user,model_telegram_message_wizard,base.group_user,1,1,1,1
+

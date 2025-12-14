@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="telegram_bot_config_default" model="telegram.bot.config">
+        <field name="bot_name">Telegram Bot</field>
+        <field name="bot_token"></field>
+        <field name="webhook_secret"></field>
+        <field name="active">False</field>
+    </record>
+</odoo>
+
