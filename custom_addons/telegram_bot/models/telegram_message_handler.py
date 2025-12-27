@@ -1,51 +1,17 @@
 # -*- coding: utf-8 -*-
 
-import json
 import logging
-from odoo import http, fields
-from odoo.http import request
+from datetime import datetime
+from odoo import fields, api
 
 _logger = logging.getLogger(__name__)
 
 
-class TelegramWebhookController(http.Controller):
-
-    @http.route('/telegram/webhook/<string:secret>', type='json', auth='public', methods=['POST'], csrf=False)
-    def telegram_webhook(self, secret, **kwargs):
-        """
-        Обработка webhook от Telegram
-        
-        Telegram отправляет POST запрос с JSON данными о сообщении
-        """
-        try:
-            # Проверить secret
-            bot_config = request.env['telegram.bot.config'].sudo().search([
-                ('webhook_secret', '=', secret),
-                ('active', '=', True)
-            ], limit=1)
-            
-            if not bot_config:
-                _logger.warning(f"Неверный webhook secret: {secret}")
-                return {'ok': False, 'error': 'Invalid secret'}
-
-            # Получить данные из запроса
-            data = request.jsonrequest
-            
-            # Обработать обновление
-            from odoo.addons.telegram_bot.models.telegram_message_handler import TelegramMessageHandler
-            
-            if 'message' in data:
-                TelegramMessageHandler.process_message(bot_config, data['message'], request.env)
-            elif 'callback_query' in data:
-                TelegramMessageHandler._process_callback_query(bot_config, data['callback_query'], request.env)
-            
-            return {'ok': True}
-            
-        except Exception as e:
-            _logger.error(f"Ошибка обработки webhook: {str(e)}", exc_info=True)
-            return {'ok': False, 'error': str(e)}
-
-    def _process_message(self, bot_config, message_data):
+class TelegramMessageHandler:
+    """Класс для обработки сообщений Telegram (используется и в webhook, и в long polling)"""
+    
+    @staticmethod
+    def process_message(bot_config, message_data, env):
         """Обработать входящее сообщение"""
         try:
             chat_id = message_data.get('chat', {}).get('id')
@@ -59,13 +25,13 @@ class TelegramWebhookController(http.Controller):
                 return
             
             # Найти или создать Telegram пользователя
-            telegram_user = request.env['telegram.user'].sudo().search([
+            telegram_user = env['telegram.user'].sudo().search([
                 ('telegram_id', '=', telegram_id)
             ], limit=1)
             
             if not telegram_user:
                 # Создать нового пользователя (пока не верифицирован)
-                telegram_user = request.env['telegram.user'].sudo().create({
+                telegram_user = env['telegram.user'].sudo().create({
                     'telegram_id': telegram_id,
                     'username': user_data.get('username'),
                     'first_name': user_data.get('first_name'),
@@ -74,7 +40,7 @@ class TelegramWebhookController(http.Controller):
                 })
                 
                 # Отправить приветственное сообщение с инструкцией
-                self._send_message(
+                TelegramMessageHandler._send_message(
                     bot_config.bot_token,
                     chat_id,
                     (
@@ -93,7 +59,7 @@ class TelegramWebhookController(http.Controller):
             
             # Обработать команды
             if text.startswith('/'):
-                self._process_command(bot_config, telegram_user, text)
+                TelegramMessageHandler._process_command(bot_config, telegram_user, text, env)
                 return
             
             # Если пользователь не верифицирован, проверить код верификации
@@ -106,7 +72,9 @@ class TelegramWebhookController(http.Controller):
                             'is_verified': True,
                             'verified_date': fields.Datetime.now(),
                         })
-                        self._send_message(
+                        # Перечитать запись для получения актуальных данных
+                        telegram_user = env['telegram.user'].sudo().browse(telegram_user.id)
+                        TelegramMessageHandler._send_message(
                             bot_config.bot_token,
                             chat_id,
                             (
@@ -119,14 +87,14 @@ class TelegramWebhookController(http.Controller):
                         )
                         return
                     else:
-                        self._send_message(
+                        TelegramMessageHandler._send_message(
                             bot_config.bot_token,
                             chat_id,
                             "❌ Неверный код верификации. Попробуйте еще раз."
                         )
                         return
                 else:
-                    self._send_message(
+                    TelegramMessageHandler._send_message(
                         bot_config.bot_token,
                         chat_id,
                         (
@@ -138,11 +106,24 @@ class TelegramWebhookController(http.Controller):
                     return
             
             # Сохранить сообщение в истории
-            from datetime import datetime
             message_date_dt = datetime.fromtimestamp(message_date) if message_date else datetime.now()
             
-            request.env['telegram.message'].sudo().create({
+            # Найти лид по партнеру (берем первый активный лид)
+            crm_lead_id = False
+            if telegram_user.partner_id:
+                lead = env['crm.lead'].sudo().search([
+                    ('partner_id', '=', telegram_user.partner_id.id),
+                    ('active', '=', True),
+                ], order='create_date desc', limit=1)
+                if lead:
+                    crm_lead_id = lead.id
+                    # Если у лида еще не привязан Telegram пользователь, привязать
+                    if not lead.telegram_user_id:
+                        lead.sudo().write({'telegram_user_id': telegram_user.id})
+            
+            env['telegram.message'].sudo().create({
                 'telegram_user_id': telegram_user.id,
+                'crm_lead_id': crm_lead_id,
                 'message_id': message_id,
                 'message_date': message_date_dt,
                 'text': text,
@@ -150,12 +131,13 @@ class TelegramWebhookController(http.Controller):
             })
             
             # Уведомить операторов
-            self._notify_operators(bot_config, telegram_user, text)
+            TelegramMessageHandler._notify_operators(bot_config, telegram_user, text, env)
             
         except Exception as e:
             _logger.error(f"Ошибка обработки сообщения: {str(e)}", exc_info=True)
 
-    def _process_command(self, bot_config, telegram_user, text):
+    @staticmethod
+    def _process_command(bot_config, telegram_user, text, env):
         """Обработать команду бота"""
         command = text.split()[0].lower()
         chat_id = telegram_user.chat_id
@@ -175,21 +157,21 @@ class TelegramWebhookController(http.Controller):
                     f"Ваш код верификации: **{telegram_user.verification_code}**\n\n"
                     "Введите этот код в системе Odoo для завершения идентификации."
                 )
-            self._send_message(bot_config.bot_token, chat_id, message)
+            TelegramMessageHandler._send_message(bot_config.bot_token, chat_id, message)
             
         elif command == '/orders':
             if not telegram_user.is_verified:
-                self._send_message(bot_config.bot_token, chat_id, "⚠️ Вы не идентифицированы.")
+                TelegramMessageHandler._send_message(bot_config.bot_token, chat_id, "⚠️ Вы не идентифицированы.")
                 return
             
             # Получить заказы клиента
-            orders = request.env['sale.order'].sudo().search([
+            orders = env['sale.order'].sudo().search([
                 ('partner_id', '=', telegram_user.partner_id.id),
                 ('state', '!=', 'cancel')
             ], limit=10, order='date_order desc')
             
             if not orders:
-                self._send_message(bot_config.bot_token, chat_id, "У вас пока нет заказов.")
+                TelegramMessageHandler._send_message(bot_config.bot_token, chat_id, "У вас пока нет заказов.")
                 return
             
             message_parts = ["📦 Ваши заказы:\n"]
@@ -206,7 +188,7 @@ class TelegramWebhookController(http.Controller):
                     f"  Сумма: {order.currency_id.symbol} {order.amount_total:.2f}"
                 )
             
-            self._send_message(bot_config.bot_token, chat_id, '\n'.join(message_parts))
+            TelegramMessageHandler._send_message(bot_config.bot_token, chat_id, '\n'.join(message_parts))
             
         elif command == '/help':
             message = (
@@ -216,14 +198,16 @@ class TelegramWebhookController(http.Controller):
                 "/help - эта справка\n\n"
                 "Вы также можете написать сообщение оператору."
             )
-            self._send_message(bot_config.bot_token, chat_id, message)
+            TelegramMessageHandler._send_message(bot_config.bot_token, chat_id, message)
 
-    def _process_callback_query(self, bot_config, callback_data):
+    @staticmethod
+    def _process_callback_query(bot_config, callback_data, env):
         """Обработать callback query (нажатие на кнопку)"""
         # Можно добавить обработку кнопок в будущем
         pass
 
-    def _notify_operators(self, bot_config, telegram_user, text):
+    @staticmethod
+    def _notify_operators(bot_config, telegram_user, text, env):
         """Уведомить операторов о новом сообщении от клиента"""
         if not bot_config.operator_user_ids:
             return
@@ -232,7 +216,8 @@ class TelegramWebhookController(http.Controller):
         # Например, создать задачу или отправить email
         pass
 
-    def _send_message(self, bot_token, chat_id, text, parse_mode='Markdown'):
+    @staticmethod
+    def _send_message(bot_token, chat_id, text, parse_mode='Markdown'):
         """Отправить сообщение в Telegram"""
         import requests
         try:

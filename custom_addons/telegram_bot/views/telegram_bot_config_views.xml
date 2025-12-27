@@ -6,19 +6,22 @@
         <field name="arch" type="xml">
             <form string="Конфигурация Telegram бота">
                 <header>
-                    <button name="action_set_webhook" string="Установить Webhook" type="object" class="oe_highlight"/>
-                    <button name="action_delete_webhook" string="Удалить Webhook" type="object"/>
+                    <button name="action_set_webhook" string="Установить Webhook" type="object" class="oe_highlight" invisible="not use_webhook"/>
+                    <button name="action_delete_webhook" string="Удалить Webhook" type="object" invisible="not use_webhook"/>
+                    <button name="action_process_updates" string="Проверить обновления сейчас" type="object" invisible="use_webhook"/>
                 </header>
                 <sheet>
                     <group>
                         <group>
                             <field name="bot_name"/>
                             <field name="bot_token" password="True" placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"/>
-                            <field name="webhook_secret" password="True"/>
+                            <field name="use_webhook" widget="boolean_toggle"/>
+                            <field name="webhook_secret" password="True" invisible="not use_webhook"/>
+                            <field name="webhook_url" readonly="1" invisible="not use_webhook"/>
                             <field name="active" widget="boolean_toggle"/>
                         </group>
                         <group>
-                            <field name="webhook_url" readonly="1"/>
+                            <field name="last_update_id" readonly="1" invisible="use_webhook"/>
                             <field name="operator_user_ids" widget="many2many_tags"/>
                         </group>
                     </group>
@@ -26,15 +29,27 @@
                         <page string="Инструкция">
                             <div class="alert alert-info" role="alert">
                                 <h4>Как настроить бота:</h4>
+                                <h5>Режим Long Polling (без HTTPS, по умолчанию):</h5>
                                 <ol>
                                     <li>Создайте бота через <a href="https://t.me/BotFather" target="_blank">@BotFather</a> в Telegram</li>
                                     <li>Получите Bot Token от BotFather</li>
                                     <li>Введите Bot Token в поле выше</li>
+                                    <li>Убедитесь, что "Использовать Webhook" выключено</li>
+                                    <li>Активируйте бота</li>
+                                    <li>Система автоматически будет получать сообщения через cron каждую минуту</li>
+                                </ol>
+                                <h5>Режим Webhook (требует HTTPS):</h5>
+                                <ol>
+                                    <li>Создайте бота через <a href="https://t.me/BotFather" target="_blank">@BotFather</a> в Telegram</li>
+                                    <li>Получите Bot Token от BotFather</li>
+                                    <li>Введите Bot Token в поле выше</li>
+                                    <li>Включите "Использовать Webhook"</li>
                                     <li>Придумайте и введите Webhook Secret (любая строка для безопасности)</li>
                                     <li>Нажмите "Установить Webhook"</li>
                                     <li>Активируйте бота</li>
                                 </ol>
-                                <p><strong>Важно:</strong> Убедитесь, что ваш Odoo доступен из интернета для работы webhook.</p>
+                                <p><strong>Важно для Webhook:</strong> Убедитесь, что ваш Odoo доступен из интернета по HTTPS для работы webhook.</p>
+                                <p><strong>Для Long Polling:</strong> HTTPS не требуется, но cron должен работать. Проверьте настройки планировщика в Odoo.</p>
                             </div>
                         </page>
                     </notebook>
@@ -43,10 +58,23 @@
         </field>
     </record>
 
+    <record id="view_telegram_bot_config_tree" model="ir.ui.view">
+        <field name="name">telegram.bot.config.tree</field>
+        <field name="model">telegram.bot.config</field>
+        <field name="arch" type="xml">
+            <tree string="Конфигурация Telegram ботов">
+                <field name="bot_name"/>
+                <field name="active" widget="boolean_toggle"/>
+                <field name="use_webhook" widget="boolean_toggle"/>
+                <field name="last_update_id" invisible="use_webhook"/>
+            </tree>
+        </field>
+    </record>
+
     <record id="action_telegram_bot_config" model="ir.actions.act_window">
         <field name="name">Конфигурация Telegram бота</field>
         <field name="res_model">telegram.bot.config</field>
-        <field name="view_mode">form</field>
+        <field name="view_mode">tree,form</field>
         <field name="target">current</field>
         <field name="domain">[]</field>
     </record>

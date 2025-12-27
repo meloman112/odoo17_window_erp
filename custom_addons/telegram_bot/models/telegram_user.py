@@ -49,9 +49,33 @@ class TelegramUser(models.Model):
     @api.model
     def create(self, vals):
         """Создать пользователя и сгенерировать код верификации"""
+        # Если partner_id не указан, создать нового партнера
+        if 'partner_id' not in vals or not vals.get('partner_id'):
+            # Сформировать имя партнера
+            name_parts = []
+            if vals.get('first_name'):
+                name_parts.append(vals['first_name'])
+            if vals.get('last_name'):
+                name_parts.append(vals['last_name'])
+            if not name_parts and vals.get('username'):
+                name_parts.append(f"@{vals['username']}")
+            if not name_parts:
+                name_parts.append(f"Telegram User {vals.get('telegram_id', '')}")
+            
+            partner_name = ' '.join(name_parts)
+            
+            # Создать партнера
+            partner = self.env['res.partner'].sudo().create({
+                'name': partner_name,
+                'is_company': False,
+            })
+            vals['partner_id'] = partner.id
+        
+        # Сгенерировать код верификации если не указан
         if 'verification_code' not in vals or not vals.get('verification_code'):
             import random
             vals['verification_code'] = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        
         return super().create(vals)
 
     def action_verify(self):

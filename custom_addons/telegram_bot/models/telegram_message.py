@@ -10,6 +10,7 @@ class TelegramMessage(models.Model):
 
     telegram_user_id = fields.Many2one('telegram.user', string='Telegram пользователь', required=True, ondelete='cascade', index=True)
     partner_id = fields.Many2one('res.partner', string='Клиент', related='telegram_user_id.partner_id', store=True, index=True)
+    crm_lead_id = fields.Many2one('crm.lead', string='Лид', ondelete='cascade', index=True, help='Лид, к которому относится сообщение')
     message_id = fields.Integer(string='Message ID', help='ID сообщения в Telegram')
     message_date = fields.Datetime(string='Дата сообщения', required=True, index=True)
     text = fields.Text(string='Текст сообщения')
@@ -42,6 +43,7 @@ class TelegramMessageWizard(models.TransientModel):
     _description = 'Мастер отправки сообщения в Telegram'
 
     telegram_user_id = fields.Many2one('telegram.user', string='Telegram пользователь', required=True)
+    crm_lead_id = fields.Many2one('crm.lead', string='Лид')
     reply_to_message_id = fields.Many2one('telegram.message', string='Ответ на сообщение')
     text = fields.Text(string='Текст сообщения', required=True)
 
@@ -57,6 +59,7 @@ class TelegramMessageWizard(models.TransientModel):
         # Сохранить в истории
         self.env['telegram.message'].create({
             'telegram_user_id': self.telegram_user_id.id,
+            'crm_lead_id': self.crm_lead_id.id if self.crm_lead_id else False,
             'message_date': fields.Datetime.now(),
             'text': self.text,
             'direction': 'outgoing',

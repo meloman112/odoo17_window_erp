@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_crm_lead_form_telegram" model="ir.ui.view">
+        <field name="name">crm.lead.form.telegram</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Добавить поле Telegram пользователя -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="telegram_user_id" widget="many2one" 
+                       options="{'no_create': True}"
+                       domain="[('partner_id', '=', partner_id)]"
+                       placeholder="Привязать Telegram пользователя"
+                       invisible="not partner_id"/>
+                <button name="action_send_telegram_message" string="Написать в Telegram" type="object"
+                        class="oe_stat_button" icon="fa-telegram"
+                        invisible="not telegram_user_id"/>
+            </xpath>
+            
+            <!-- Добавить Telegram чат в раздел с заметками/задачами -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Telegram чат" name="telegram_chat" invisible="not telegram_user_id">
+                    <div class="alert alert-info" role="alert" invisible="not telegram_user_id">
+                        <p>Telegram пользователь: <strong><field name="telegram_user_id" readonly="1" nolabel="1"/></strong></p>
+                    </div>
+                    <field name="telegram_message_ids" nolabel="1" readonly="1">
+                        <tree string="Telegram сообщения" decoration-success="direction == 'outgoing'" decoration-info="direction == 'incoming'">
+                            <field name="message_date" widget="datetime" string="Дата"/>
+                            <field name="direction" widget="badge" string="Тип"/>
+                            <field name="text" widget="text" string="Сообщение"/>
+                            <field name="user_id" string="Оператор" invisible="direction == 'incoming'"/>
+                            <field name="is_read" widget="boolean_toggle" string="Прочитано"/>
+                        </tree>
+                    </field>
+                    <div class="oe_button_box">
+                        <button name="action_send_telegram_message" string="Отправить сообщение" type="object"
+                                class="oe_stat_button" icon="fa-telegram"/>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_crm_lead_tree_telegram" model="ir.ui.view">
+        <field name="name">crm.lead.tree.telegram</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_tree_view_leads"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="telegram_user_id" widget="many2one" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+
